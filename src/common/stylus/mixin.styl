@@ -1,0 +1,18 @@
+// 定位
+position($type, $top=auto, $right=auto, $bottom=auto, $left=auto)
+  position: $type
+  top: $top
+  bottom: $bottom
+  left: $left
+  right: $right
+// 不换行且最后有点
+no-wrap()
+  text-overflow: ellipsis
+  overflow: hidden
+  white-space: nowrap
+// 扩展点击区域
+extend-click()
+  position: relative
+  &:before
+    content: ''
+    position(absolute, -10px, -10px, -10px, -10px)
