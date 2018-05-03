@@ -1,10 +1,10 @@
 <template>
   <section class="menu">
     <div class="menu-list">
-      <a class="add-text">
+      <router-link class="add-text" to="add">
         <i class="icon-add"></i>
         新增日记
-      </a>
+      </router-link>
       <ul>
         <li class="list-item active">
           <i class="list-icon icon-face-happy"></i>
