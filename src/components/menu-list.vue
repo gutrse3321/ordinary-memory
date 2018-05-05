@@ -1,5 +1,5 @@
 <template>
-  <section class="menu">
+  <section class="menu" ref="menu" :style="{'display': show}">
     <div class="menu-list">
       <router-link class="add-text" to="add">
         <i class="icon-add"></i>
@@ -75,7 +75,16 @@
   </section>
 </template>
 <script>
+import { mapGetters } from 'vuex'
 export default {
+  computed: {
+    show () {
+      return this.menuShow ? 'block' : 'none'
+    },
+    ...mapGetters([
+      'menuShow'
+    ])
+  }
 }
 </script>
 <style lang="stylus" scoped>
@@ -92,6 +101,7 @@ export default {
   border-radius: 10px
 
 .menu
+  display: none
   position(absolute, 0, 0, 0, 0)
   width: $menu-width
   background-color: rgba(255, 255, 255, 0)
@@ -138,4 +148,6 @@ export default {
       padding: .75em 4.5em
   .active
     color: #fff
+  @media screen and (min-width: 40em)
+    display: block !important
 </style>

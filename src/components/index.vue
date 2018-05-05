@@ -1,17 +1,35 @@
 <template>
-  <section class="content">
+  <section>
+    <div class="icon-wrapper" @click="toggleShow">
+      <i class="icon-menu"></i>
+    </div>
     <div class="content-title">
       平凡的记忆
       <span>"我们所度过的每一个日常,也许就是连续发生的奇迹"</span>
     </div>
-    <div class="content-add-text">
-        <i class="icon-add"></i>
-        新增日记
+    <div class="content-add-text" @click="addNote">
+      <i class="icon-add"></i>
+      新增日记
     </div>
   </section>
 </template>
 <script>
+import { mapMutations } from 'vuex'
+
 export default {
+  methods: {
+    addNote () {
+      this.$router.push({
+        path: '/add'
+      })
+    },
+    toggleShow () {
+      this.setMenuShow(true)
+    },
+    ...mapMutations({
+      setMenuShow: 'SET_MENU_SHOW'
+    })
+  }
 }
 </script>
 <style lang="stylus" scoped>
@@ -41,4 +59,13 @@ export default {
   &:hover
     transform: translate3d(-50%, -50%, 0) scale(1.2)
     border-color: $color-text-c
+.icon-wrapper
+  padding: .75rem .5rem
+  font-size: $font-size-medium-m
+  opacity: 1
+  transition: opacity .3s ease-out
+  i
+    cursor: pointer
+  @media screen and (min-width: 40rem)
+    opacity: 0
 </style>

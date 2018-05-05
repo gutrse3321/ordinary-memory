@@ -1,10 +1,15 @@
 <template>
-  <section class="content">
-    写新日记
+  <section>
+    <tools-bar></tools-bar>
   </section>
 </template>
 <script>
+import ToolsBar from '@/base/toolsbar'
+
 export default {
+  components: {
+    ToolsBar
+  }
 }
 </script>
 <style lang="stylus" scoped>

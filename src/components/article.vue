@@ -1,5 +1,5 @@
 <template>
-  <section class="content">
+  <section>
     日记内容
   </section>
 </template>
