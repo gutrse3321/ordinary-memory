@@ -1,13 +1,18 @@
 <template>
   <div class="toolbar">
     <div class="icon-menu-wrapper">
-      <i class="icon-menu"></i>
+      <i class="icon-menu" @click="toggleShow"></i>
     </div>
     <div class="title">
-      <i class="icon-lock"></i>
-      <input class="title-input" type="text">
+      <i class="icon-lock" v-show="!isAdd"></i>
+      <input class="title-input"
+            type="text"
+            ref="title"
+            :placeholder="titlePlaceholder"
+            v-focus="isAdd"
+      >
     </div>
-    <div class="tool-container">
+    <div class="tool-container" v-show="!isAdd">
       <div class="edit-icon-con">
         <i class="icon icon-edit"></i>
       </div>
@@ -18,12 +23,26 @@
   </div>
 </template>
 <script>
+import { mapMutations } from 'vuex'
+
 export default {
   props: {
     isAdd: {
       type: Boolean,
-      default: true
+      default: false
+    },
+    titlePlaceholder: {
+      type: String,
+      default: '请输入标题'
     }
+  },
+  methods: {
+    toggleShow () {
+      this.setMenuShow(true)
+    },
+    ...mapMutations({
+      setMenuShow: 'SET_MENU_SHOW'
+    })
   }
 }
 </script>
@@ -42,8 +61,16 @@ export default {
     .icon-menu-wrapper
       font-size: $font-size-medium-m
       flex-grow: 1
+      opacity: 1
+      transition: opacity .3s ease-out
       i
-       cursor: pointer
+        width: 30px
+        cursor: pointer
+        display: block
+      @media screen and (min-width: 40rem)
+        opacity: 0
+        i
+          display: none
     .title
       position(relative, 0, 0, 0, 0)
       flex-grow: 4

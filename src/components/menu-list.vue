@@ -6,7 +6,7 @@
         新增日记
       </router-link>
       <ul>
-        <li class="list-item active">
+        <li class="list-item active" @click="toArticle">
           <i class="list-icon icon-face-happy"></i>
           在和解后的渐渐成熟
         </li>
@@ -84,6 +84,13 @@ export default {
     ...mapGetters([
       'menuShow'
     ])
+  },
+  methods: {
+    toArticle () {
+      this.$router.push({
+        path: '/article'
+      })
+    }
   }
 }
 </script>

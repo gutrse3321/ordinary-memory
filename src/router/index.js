@@ -3,6 +3,7 @@ import Router from 'vue-router'
 import Layouts from 'components/layouts'
 import Index from 'components/index'
 import Add from 'components/add'
+import Article from 'components/article'
 
 Vue.use(Router)
 
@@ -19,6 +20,10 @@ export default new Router({
         {
           path: '/add',
           component: Add
+        },
+        {
+          path: '/article',
+          component: Article
         }
       ]
     }
