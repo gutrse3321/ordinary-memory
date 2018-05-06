@@ -13,6 +13,9 @@
       >
     </div>
     <div class="tool-container" v-show="!isAdd">
+      <div class="face-icon-con">
+        <i class="icon icon-face-happy"></i>
+      </div>
       <div class="edit-icon-con">
         <i class="icon icon-edit"></i>
       </div>
