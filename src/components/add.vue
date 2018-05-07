@@ -15,11 +15,4 @@ export default {
 }
 </script>
 <style lang="stylus" scoped>
-  @import '~common/stylus/mixin'
-
-  .test
-    background: #ccc
-    position(absolute, 50px, 0, 0, 0)
-    overflow-y: scroll
-    overflow-x: hidden
 </style>

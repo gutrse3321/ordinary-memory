@@ -4,11 +4,17 @@
       <i class="icon-menu" @click="toggleShow"></i>
     </div>
     <div class="title">
-      <i class="icon-lock" v-show="!isAdd"></i>
+      <i class="icon-lock"
+        v-show="!isAdd"
+        @click="toggleLock"
+        :style="{'color': lock ? '#fff' : '#ccc'}"
+      ></i>
       <input class="title-input"
+            :value="title"
             type="text"
             ref="title"
             :placeholder="titlePlaceholder"
+            :disabled="lock && !isAdd"
             v-focus="isAdd"
       >
     </div>
@@ -37,14 +43,31 @@ export default {
     titlePlaceholder: {
       type: String,
       default: '请输入标题'
+    },
+    title: {
+      type: String,
+      default: ''
+    }
+  },
+  data () {
+    return {
+      lock: true
     }
   },
   methods: {
     toggleShow () {
       this.setMenuShow(true)
     },
+    toggleLock () {
+      if (this.lock) {
+        this.lock = false
+      } else {
+        this.lock = true
+      }
+    },
     ...mapMutations({
-      setMenuShow: 'SET_MENU_SHOW'
+      setMenuShow: 'SET_MENU_SHOW',
+      setArticle: 'SET_ARTICLE'
     })
   }
 }

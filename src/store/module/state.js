@@ -1,5 +1,6 @@
 const state = {
-  menuShow: false
+  menuShow: false,
+  article: {}
 }
 
 export default state

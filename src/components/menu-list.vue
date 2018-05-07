@@ -6,77 +6,28 @@
         新增日记
       </router-link>
       <ul>
-        <li class="list-item active" @click="toArticle">
+        <li class="list-item"
+            v-for="(item, index) in list"
+            :key="index"
+            @click="toArticle(item)"
+        >
           <i class="list-icon icon-face-happy"></i>
-          在和解后的渐渐成熟
-        </li>
-        <li class="list-item">
-          <i class="list-icon icon-face-done"></i>
-          在辗转中的度过
-        </li>
-        <li class="list-item">
-          <i class="list-icon icon-face-notbad"></i>
-          纠结
-        </li>
-        <li class="list-item">
-          <i class="list-icon icon-face-lmfao"></i>
-          冬天了
-        </li>
-        <li class="list-item">
-          <i class="list-icon icon-face-lmfao"></i>
-          冬天了
-        </li>
-        <li class="list-item">
-          <i class="list-icon icon-face-lmfao"></i>
-          冬天了
-        </li>
-        <li class="list-item">
-          <i class="list-icon icon-face-lmfao"></i>
-          冬天了
-        </li>
-        <li class="list-item">
-          <i class="list-icon icon-face-lmfao"></i>
-          冬天了
-        </li>
-        <li class="list-item">
-          <i class="list-icon icon-face-lmfao"></i>
-          冬天了
-        </li>
-        <li class="list-item">
-          <i class="list-icon icon-face-lmfao"></i>
-          冬天了
-        </li>
-        <li class="list-item">
-          <i class="list-icon icon-face-lmfao"></i>
-          冬天了
-        </li>
-        <li class="list-item">
-          <i class="list-icon icon-face-lmfao"></i>
-          冬天了
-        </li>
-        <li class="list-item">
-          <i class="list-icon icon-face-lmfao"></i>
-          冬天了
-        </li>
-        <li class="list-item">
-          <i class="list-icon icon-face-lmfao"></i>
-          冬天了
-        </li>
-        <li class="list-item">
-          <i class="list-icon icon-face-lmfao"></i>
-          冬天了
-        </li>
-        <li class="list-item">
-          <i class="list-icon icon-face-lmfao"></i>
-          冬天了
+          {{ item.title }}
         </li>
       </ul>
     </div>
   </section>
 </template>
 <script>
-import { mapGetters } from 'vuex'
+import { mapGetters, mapMutations } from 'vuex'
+import { getMemories } from '@/api'
+
 export default {
+  data () {
+    return {
+      list: []
+    }
+  },
   computed: {
     show () {
       return this.menuShow ? 'block' : 'none'
@@ -86,11 +37,23 @@ export default {
     ])
   },
   methods: {
-    toArticle () {
+    toArticle (item) {
       this.$router.push({
-        path: '/article'
+        path: `/article/${item.mid}`
       })
-    }
+      this.setArticle(item)
+    },
+    _getMemories () {
+      getMemories().then(res => {
+        this.list = res.data.memories
+      })
+    },
+    ...mapMutations({
+      setArticle: 'SET_ARTICLE'
+    })
+  },
+  created () {
+    this._getMemories()
   }
 }
 </script>

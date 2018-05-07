@@ -1,6 +1,6 @@
 <template>
   <section class="markeditor-wrapper">
-    <div class="marked" v-show="!isEdit"></div>
+    <div class="marked" v-show="!isEdit" v-html="content"></div>
     <div class="editor" v-show="isEdit">
       <textarea class="textarea"
                 :value="inputVal"
@@ -25,6 +25,10 @@ export default {
     isEdit: {
       type: Boolean,
       default: true
+    },
+    content: {
+      type: String,
+      default: ''
     }
   },
   data () {
