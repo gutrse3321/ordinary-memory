@@ -42,7 +42,7 @@ export default {
     },
     titlePlaceholder: {
       type: String,
-      default: '请输入标题'
+      default: '请输入标题,回车键保存'
     },
     title: {
       type: String,

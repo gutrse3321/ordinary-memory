@@ -1,10 +1,10 @@
 <template>
   <section class="menu" ref="menu" :style="{'display': show}">
     <div class="menu-list">
-      <router-link class="add-text" to="add">
+      <div class="add-text" @click="toAdd">
         <i class="icon-add"></i>
         新增日记
-      </router-link>
+      </div>
       <ul>
         <li class="list-item"
             v-for="(item, index) in list"
@@ -32,6 +32,9 @@ export default {
     show () {
       return this.menuShow ? 'block' : 'none'
     },
+    newMid () {
+      return this.list[this.list.length - 1].mid + 1
+    },
     ...mapGetters([
       'menuShow'
     ])
@@ -43,9 +46,19 @@ export default {
       })
       this.setArticle(item)
     },
+    toAdd () {
+      this.$router.push({path: '/add'})
+      let article = {
+        mid: this.newMid,
+        title: '',
+        face: 1,
+        content: ''
+      }
+      this.setArticle(article)
+    },
     _getMemories () {
       getMemories().then(res => {
-        this.list = res.data.memories
+        this.list = res.data
       })
     },
     ...mapMutations({
