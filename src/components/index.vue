@@ -14,20 +14,38 @@
   </section>
 </template>
 <script>
-import { mapMutations } from 'vuex'
+import { mapGetters, mapMutations } from 'vuex'
 
 export default {
+  computed: {
+    newMid () {
+      return this.menuList[0].mid + 1
+    },
+    ...mapGetters([
+      'menuShow',
+      'menuList'
+    ])
+  },
   methods: {
     addNote () {
-      this.$router.push({
-        path: '/add'
-      })
+      this.$router.push({path: '/add'})
+      let article = {
+        mid: this.newMid,
+        title: '',
+        face: 1,
+        content: '# 一天的结束...'
+      }
+      this.setArticle(article)
+      if (this.menuShow) {
+        this.setMenuShow(false)
+      }
     },
     toggleShow () {
       this.setMenuShow(true)
     },
     ...mapMutations({
-      setMenuShow: 'SET_MENU_SHOW'
+      setMenuShow: 'SET_MENU_SHOW',
+      setArticle: 'SET_ARTICLE'
     })
   }
 }

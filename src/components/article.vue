@@ -1,7 +1,10 @@
 <template>
   <section>
     <tools-bar :is-add="false" :title="title"></tools-bar>
-    <mark-editor :is-edit="false" :content="content"></mark-editor>
+    <mark-editor :is-edit="editor"></mark-editor>
+    <div class="created-time">
+      {{ time }}
+    </div>
   </section>
 </template>
 <script>
@@ -20,8 +23,12 @@ export default {
     content () {
       return this.article.content
     },
+    time () {
+      return this.article.createTime
+    },
     ...mapGetters([
-      'article'
+      'article',
+      'editor'
     ])
   },
   methods: {
@@ -37,4 +44,9 @@ export default {
 }
 </script>
 <style lang="stylus" scoped>
+@import '~common/stylus/variable'
+@import '~common/stylus/mixin'
+
+.created-time
+  position(absolute, auto, 1rem, 1rem, auto)
 </style>

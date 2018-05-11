@@ -10,12 +10,13 @@
         :style="{'color': lock ? '#fff' : '#ccc'}"
       ></i>
       <input class="title-input"
+            ref="title"
             :value="title"
             type="text"
-            ref="title"
             :placeholder="titlePlaceholder"
             :disabled="lock && !isAdd"
             v-focus="isAdd"
+            @change="saveTitle"
       >
     </div>
     <div class="tool-container" v-show="!isAdd">
@@ -23,16 +24,23 @@
         <i class="icon icon-face-happy"></i>
       </div>
       <div class="edit-icon-con">
-        <i class="icon icon-edit"></i>
+        <i class="icon icon-edit"
+          @click="toggleEdit"
+          :style="{'color': edit ? '#fff' : '#ccc'}"
+        ></i>
       </div>
       <div class="delete-icon-con">
-        <i class="icon icon-delete"></i>
+        <i class="icon icon-delete"
+          @click="deleteMemory"
+        ></i>
       </div>
     </div>
   </div>
 </template>
 <script>
-import { mapMutations } from 'vuex'
+import { mapMutations, mapGetters } from 'vuex'
+import { delMemory } from '@/api'
+import { Message } from 'element-ui'
 
 export default {
   props: {
@@ -42,7 +50,7 @@ export default {
     },
     titlePlaceholder: {
       type: String,
-      default: '请输入标题,回车键保存'
+      default: '请输入标题'
     },
     title: {
       type: String,
@@ -51,8 +59,15 @@ export default {
   },
   data () {
     return {
-      lock: true
+      lock: true,
+      edit: false
     }
+  },
+  computed: {
+    ...mapGetters([
+      'article',
+      'menuList'
+    ])
   },
   methods: {
     toggleShow () {
@@ -61,13 +76,73 @@ export default {
     toggleLock () {
       if (this.lock) {
         this.lock = false
+        Message({
+          type: 'success',
+          showClose: true,
+          message: '已解锁标题'
+        })
       } else {
         this.lock = true
+        Message.success({
+          type: 'success',
+          showClose: true,
+          message: '已锁定标题'
+        })
       }
+    },
+    // 设置是否编辑，并将状态提交mutation
+    toggleEdit () {
+      if (this.edit) {
+        this.setEditor(false)
+        this.edit = false
+      } else {
+        this.setEditor(true)
+        this.edit = true
+      }
+    },
+    // 保存标题到vuex mutation
+    saveTitle (e) {
+      let newArticle = Object.assign({}, this.article, {
+        title: this.$refs.title.value
+      })
+      this.setArticle(newArticle)
+      this.$refs.title.blur()
+    },
+    deleteMemory () {
+      delMemory(this.article).then(res => {
+        // 拷贝getters的列表数据
+        // 查询数组中与删除的日记相同的，然后删除他
+        let list = this.menuList.slice()
+        list.forEach((item, index) => {
+          if (item.mid === this.article.mid) {
+            list.splice(index, 1)
+          }
+        })
+        this.setMenuList(list)
+        // 提示删除message
+        Message({
+          type: 'success',
+          showClose: true,
+          message: '删除成功~'
+        })
+        // 跳转到首页
+        this.$router.push({
+          path: '/'
+        })
+      }).catch(err => {
+        // 提示删除失败message
+        Message({
+          type: 'error',
+          showClose: true,
+          message: `删除失败: ${err}`
+        })
+      })
     },
     ...mapMutations({
       setMenuShow: 'SET_MENU_SHOW',
-      setArticle: 'SET_ARTICLE'
+      setArticle: 'SET_ARTICLE',
+      setEditor: 'SET_EDITOR',
+      setMenuList: 'SET_MENU_LIST'
     })
   }
 }

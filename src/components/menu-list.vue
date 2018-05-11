@@ -1,12 +1,16 @@
 <template>
   <section class="menu" ref="menu" :style="{'display': show}">
     <div class="menu-list">
-      <div class="add-text" @click="toAdd">
+      <div class="add-text"
+        @click="toAdd"
+        :class="{'add-active': selectMid === (-2)}"
+      >
         <i class="icon-add"></i>
         新增日记
       </div>
       <ul>
         <li class="list-item"
+            :class="{'active': item.mid === selectMid}"
             v-for="(item, index) in list"
             :key="index"
             @click="toArticle(item)"
@@ -25,7 +29,8 @@ import { getMemories } from '@/api'
 export default {
   data () {
     return {
-      list: []
+      list: [],
+      selectMid: -1
     }
   },
   computed: {
@@ -33,10 +38,12 @@ export default {
       return this.menuShow ? 'block' : 'none'
     },
     newMid () {
-      return this.list[this.list.length - 1].mid + 1
+      return this.list[0].mid + 1
     },
     ...mapGetters([
-      'menuShow'
+      'menuShow',
+      'editor',
+      'menuList'
     ])
   },
   methods: {
@@ -45,6 +52,13 @@ export default {
         path: `/article/${item.mid}`
       })
       this.setArticle(item)
+      this.selectMid = item.mid
+      if (this.menuShow) {
+        this.setMenuShow(false)
+      }
+      if (this.editor) {
+        this.setEditor(false)
+      }
     },
     toAdd () {
       this.$router.push({path: '/add'})
@@ -52,18 +66,51 @@ export default {
         mid: this.newMid,
         title: '',
         face: 1,
-        content: ''
+        content: '# 一天的结束...'
       }
       this.setArticle(article)
+      this.selectMid = -2
+      if (this.menuShow) {
+        this.setMenuShow(false)
+      }
     },
     _getMemories () {
       getMemories().then(res => {
-        this.list = res.data
+        let data = res.data.sort(this._compare('mid'))
+        this.setMenuList(data)
+        this.list = this.menuList
       })
     },
+    // 比较器，根据对象某属性排序
+    _compare (propName) {
+      return (obj1, obj2) => {
+        let val1 = obj1[propName]
+        let val2 = obj2[propName]
+        if (val1 < val2) {
+          return 1
+        } else if (val1 > val2) {
+          return -1
+        } else {
+          return 0
+        }
+      }
+    },
     ...mapMutations({
-      setArticle: 'SET_ARTICLE'
+      setArticle: 'SET_ARTICLE',
+      setMenuShow: 'SET_MENU_SHOW',
+      setEditor: 'SET_EDITOR',
+      setMenuList: 'SET_MENU_LIST'
     })
+  },
+  watch: {
+    menuList (newList, oldList) {
+      if (newList !== oldList) {
+        getMemories().then(res => {
+          let data = res.data.sort(this._compare('mid'))
+          this.list = data
+        })
+      }
+    }
   },
   created () {
     this._getMemories()
@@ -129,6 +176,9 @@ export default {
     &:hover
       color: $color-text-c
       padding: .75em 4.5em
+  .add-active
+    color: $color-text-c
+    padding: .75em 4.5em
   .active
     color: #fff
   @media screen and (min-width: 40em)

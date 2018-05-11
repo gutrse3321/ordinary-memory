@@ -1,6 +1,6 @@
 <template>
   <section class="markeditor-wrapper">
-    <div class="marked" v-show="!isEdit" v-html="content"></div>
+    <div class="marked" v-show="!isEdit" v-html="markedResult"></div>
     <div class="editor" v-show="isEdit">
       <textarea class="textarea"
                 :value="inputVal"
@@ -14,21 +14,23 @@
       <div class="iconShow-wrapper">
         <i class="icon-face-lmfao" @click="toggleShow"></i>
       </div>
+      <div class="save-wrapper">
+        <div class="btn save" @click="saveMemory">发布</div>
+      </div>
     </div>
   </section>
 </template>
 <script>
+import { mapMutations, mapGetters } from 'vuex'
+import { Message } from 'element-ui'
 import marked from 'marked'
+import axios from 'axios'
 
 export default {
   props: {
     isEdit: {
       type: Boolean,
       default: true
-    },
-    content: {
-      type: String,
-      default: ''
     }
   },
   data () {
@@ -39,8 +41,15 @@ export default {
   },
   computed: {
     markdown () {
-      return marked(this.inputVal)
-    }
+      return this.article.mid !== undefined ? marked(this.inputVal) : ''
+    },
+    markedResult () {
+      return this.article.mid !== undefined ? marked(this.article.content) : ''
+    },
+    ...mapGetters([
+      'article',
+      'menuList'
+    ])
   },
   methods: {
     updateVal (e) {
@@ -64,7 +73,70 @@ export default {
         }, 300)
         this.flag = true
       }
+    },
+    saveMemory () {
+      let newArticle = Object.assign({}, this.article, {
+        content: this.$refs.textarea.value
+      })
+      this.setArticle(newArticle)
+      const url = '/api/addMemory'
+      // 拷贝Getters获取的菜单列表
+      let newList = this.menuList.slice()
+      axios.post(url, this.article).then(res => {
+        // 提示message
+        Message({
+          type: 'success',
+          showClose: true,
+          message: '发布成功~'
+        })
+        // 跳转到刚刚发布的日记
+        this.$router.push({
+          path: `/article/${this.article.mid}`
+        })
+        // 将新添加的日记push进去
+        newList.push(this.article)
+        newList = newList.sort(this._compare('mid'))
+        this.setMenuList(newList)
+      }).catch(err => {
+        // 提示错误信息
+        Message({
+          type: 'error',
+          showClose: true,
+          message: `发布失败: ${err}`
+        })
+      })
+    },
+    // 比较器，根据对象某属性排序
+    _compare (propName) {
+      return (obj1, obj2) => {
+        let val1 = obj1[propName]
+        let val2 = obj2[propName]
+        if (val1 < val2) {
+          return 1
+        } else if (val1 > val2) {
+          return -1
+        } else {
+          return 0
+        }
+      }
+    },
+    _putContent () {
+      this.inputVal = this.article.content
+    },
+    ...mapMutations({
+      setArticle: 'SET_ARTICLE',
+      setMenuList: 'SET_MENU_LIST'
+    })
+  },
+  watch: {
+    article (newItem, oldItem) {
+      if (oldItem !== newItem) {
+        this.inputVal = newItem.content
+      }
     }
+  },
+  created () {
+    this._putContent()
   }
 }
 </script>
@@ -114,7 +186,7 @@ export default {
     background: $color-text-a
     font-size: $font-size-small
     font-family: sans-serif
-    padding: 20px
+    padding: 20px 10px 60px 10px
   .marked
     display: none
     overflow-y: scroll
@@ -129,4 +201,15 @@ export default {
       font-size: $font-size-medium-m
     @media screen and (max-width: 40rem)
       opacity: 1
+  .save-wrapper
+    position(absolute, auto, auto, .5rem, .5rem)
+    .btn
+      padding: .5rem
+      border-radius: 6px
+      border: 1px solid rgba(255, 255, 255, .5)
+      cursor: pointer
+      transition: all .3s ease
+      &:hover
+        background: rgba(255, 255, 255, .5)
+        color: #000
 </style>

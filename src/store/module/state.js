@@ -1,6 +1,8 @@
 const state = {
   menuShow: false,
-  article: {}
+  article: {},
+  editor: false,
+  menuList: []
 }
 
 export default state
