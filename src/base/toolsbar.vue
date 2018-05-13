@@ -11,7 +11,7 @@
       ></i>
       <input class="title-input"
             ref="title"
-            :value="title"
+            :value="article.title"
             type="text"
             :placeholder="titlePlaceholder"
             :disabled="lock && !isAdd"
@@ -19,17 +19,23 @@
             @change="saveTitle"
       >
     </div>
-    <div class="tool-container" v-show="!isAdd">
-      <div class="face-icon-con">
-        <i class="icon icon-face-happy"></i>
+    <div class="tool-container">
+      <div class="face-icon-con"
+          ref="face"
+          v-show="editor || isAdd"
+      >
+        <i class="icon"
+          :class="faceName"
+          @click="toggleFace"
+        ></i>
       </div>
-      <div class="edit-icon-con">
+      <div class="edit-icon-con" v-show="!isAdd">
         <i class="icon icon-edit"
           @click="toggleEdit"
           :style="{'color': edit ? '#fff' : '#ccc'}"
         ></i>
       </div>
-      <div class="delete-icon-con">
+      <div class="delete-icon-con" v-show="!isAdd">
         <i class="icon icon-delete"
           @click="deleteMemory"
         ></i>
@@ -41,6 +47,8 @@
 import { mapMutations, mapGetters } from 'vuex'
 import { delMemory } from '@/api'
 import { Message } from 'element-ui'
+import { face } from 'common/js/config'
+import { debounce } from 'common/js/util'
 
 export default {
   props: {
@@ -51,22 +59,21 @@ export default {
     titlePlaceholder: {
       type: String,
       default: '请输入标题'
-    },
-    title: {
-      type: String,
-      default: ''
     }
   },
   data () {
     return {
       lock: true,
-      edit: false
+      edit: false,
+      faceName: 'icon-face-lmfao',
+      faceNum: 1
     }
   },
   computed: {
     ...mapGetters([
       'article',
-      'menuList'
+      'menuList',
+      'editor'
     ])
   },
   methods: {
@@ -100,13 +107,18 @@ export default {
         this.edit = true
       }
     },
+    toggleFace () {
+      face.length === this.faceNum ? this.faceNum = 1 : this.faceNum++
+      this.faceName = face[this.faceNum - 1]
+      this.$refs.face.style['webkitTransform'] = 'scale(1.8)'
+      this.$refs.face.style['transform'] = 'scale(1.8)'
+    },
     // 保存标题到vuex mutation
     saveTitle (e) {
       let newArticle = Object.assign({}, this.article, {
         title: this.$refs.title.value
       })
       this.setArticle(newArticle)
-      this.$refs.title.blur()
     },
     deleteMemory () {
       delMemory(this.article).then(res => {
@@ -144,6 +156,24 @@ export default {
       setEditor: 'SET_EDITOR',
       setMenuList: 'SET_MENU_LIST'
     })
+  },
+  created () {
+    this.$watch('faceNum', debounce(newNum => {
+      // 将表情代码加入到article对象中
+      let newArticle = Object.assign({}, this.article, {
+        face: newNum
+      })
+      // 延时提交到mutation，防止多次修改
+      this.setArticle(newArticle)
+      Message({
+        type: 'success',
+        showClose: true,
+        message: '已修改表情'
+      })
+      // 增加选择后的transform scale
+      this.$refs.face.style['webkitTransform'] = 'scale(1)'
+      this.$refs.face.style['transform'] = 'scale(1)'
+    }, 300))
   }
 }
 </script>
@@ -205,6 +235,8 @@ export default {
       .icon
         font-size: $font-size-small
         width: 30px
+      .face-icon-con
+        transition: transform .2s ease-out
       .edit-icon-con
         position(relative, 0, 0, 0, 0)
         &:after

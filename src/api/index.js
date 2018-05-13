@@ -14,9 +14,17 @@ export const getMemories = params => {
 }
 
 // 删除一篇日记
-// localhost:3000/api/del
+// localhost:3000/api/delMemory
 export const delMemory = params => {
   const url = `/api/delMemory/${params.mid}`
 
   return axios.delete(url)
+}
+
+// 修改日记
+// localhost:3000/api/updateMemory
+export const updateMemory = data => {
+  const url = `/api/updateMemory/${data.mid}`
+
+  return axios.patch(url, data)
 }

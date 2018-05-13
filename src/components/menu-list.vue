@@ -15,7 +15,7 @@
             :key="index"
             @click="toArticle(item)"
         >
-          <i class="list-icon icon-face-happy"></i>
+          <i class="list-icon" :class="faceArr[item.face - 1]"></i>
           {{ item.title }}
         </li>
       </ul>
@@ -25,12 +25,14 @@
 <script>
 import { mapGetters, mapMutations } from 'vuex'
 import { getMemories } from '@/api'
+import { face } from 'common/js/config'
 
 export default {
   data () {
     return {
       list: [],
-      selectMid: -1
+      selectMid: -1,
+      faceArr: []
     }
   },
   computed: {
@@ -114,6 +116,7 @@ export default {
   },
   created () {
     this._getMemories()
+    this.faceArr = face.slice()
   }
 }
 </script>

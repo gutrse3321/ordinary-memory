@@ -15,7 +15,8 @@
         <i class="icon-face-lmfao" @click="toggleShow"></i>
       </div>
       <div class="save-wrapper">
-        <div class="btn save" @click="saveMemory">发布</div>
+        <div class="btn save" v-if="!editor" @click="saveMemory">发布</div>
+        <div class="btn edit" v-else @click="updateMemory">修改</div>
       </div>
     </div>
   </section>
@@ -23,6 +24,7 @@
 <script>
 import { mapMutations, mapGetters } from 'vuex'
 import { Message } from 'element-ui'
+import { updateMemory } from '@/api'
 import marked from 'marked'
 import axios from 'axios'
 
@@ -48,7 +50,8 @@ export default {
     },
     ...mapGetters([
       'article',
-      'menuList'
+      'menuList',
+      'editor'
     ])
   },
   methods: {
@@ -75,6 +78,25 @@ export default {
       }
     },
     saveMemory () {
+      // 前端验证
+      if (this.$refs.textarea.value === '') {
+        Message({
+          type: 'warning',
+          showClose: true,
+          message: '没有写任何内容哦！'
+        })
+        this.$refs.textarea.focus()
+        return
+      }
+      // 前端验证标题
+      if (this.article.title === '') {
+        Message({
+          type: 'warning',
+          showClose: true,
+          message: '没有写上标题哦！'
+        })
+        return
+      }
       let newArticle = Object.assign({}, this.article, {
         content: this.$refs.textarea.value
       })
@@ -103,6 +125,60 @@ export default {
           type: 'error',
           showClose: true,
           message: `发布失败: ${err}`
+        })
+      })
+    },
+    updateMemory () {
+      // 前端验证
+      if (this.$refs.textarea.value === '') {
+        Message({
+          type: 'warning',
+          showClose: true,
+          message: '没有写任何内容哦！'
+        })
+        this.$refs.textarea.focus()
+        return
+      }
+      // 前端验证标题
+      if (this.article.title === '') {
+        Message({
+          type: 'warning',
+          showClose: true,
+          message: '没有写上标题哦！'
+        })
+        return
+      }
+      // 组见修改后的日记对象
+      let newArticle = Object.assign({}, this.article, {
+        content: this.$refs.textarea.value
+      })
+      this.setArticle(newArticle)
+      // 拷贝getters获取的菜单列表
+      let newList = this.menuList.slice()
+
+      // axios操作
+      updateMemory(this.article).then(res => {
+        // 提示消息
+        Message({
+          type: 'success',
+          showClose: true,
+          message: '修改完成！'
+        })
+        // 遍历newList，找到之前的日记对象，将新的日记替换到newList中
+        // 提交新的list到mutation中
+        newList.forEach((item, index) => {
+          if (item.mid === newArticle.mid) {
+            newList.splice(index, 1, newArticle)
+          }
+        })
+        newList = newList.sort(this._compare('mid'))
+        this.setMenuList(newList)
+      }).catch(err => {
+        // 提示修改失败的消息
+        Message({
+          type: 'error',
+          showClose: true,
+          message: `修改失败:${err}`
         })
       })
     },

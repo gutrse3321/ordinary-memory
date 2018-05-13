@@ -1,6 +1,6 @@
 <template>
   <section>
-    <tools-bar :is-add="false" :title="title"></tools-bar>
+    <tools-bar :is-add="false"></tools-bar>
     <mark-editor :is-edit="editor"></mark-editor>
     <div class="created-time">
       {{ time }}
@@ -17,12 +17,6 @@ export default {
     ToolsBar, MarkEditor
   },
   computed: {
-    title () {
-      return this.article.title
-    },
-    content () {
-      return this.article.content
-    },
     time () {
       return this.article.createTime
     },
